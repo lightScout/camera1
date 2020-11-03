@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'display_picture_screen.dart';
 
-// A screen that takes in a list of cameras and the Directory to store images.
 class TakePictureScreen extends StatefulWidget {
   static const id = 'TakePictureScreen';
 
@@ -117,28 +115,34 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     var path1;
     var path2;
     try {
-      // 1
       path1 = join(
         (await getTemporaryDirectory()).path,
         '${DateTime.now()}.png',
       );
 
-      // 2
       await controller.takePicture(path1);
 
-      //3
       _onSwitchCamera();
 
-      //5
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => DisplayPictureScreen(
-      //       imagePath1: path1,
-      //       imagePath2: path2,
-      //     ),
-      //   ),
-      // );
+      try {
+        path2 = join(
+          (await getTemporaryDirectory()).path,
+          '${DateTime.now()}.png',
+        );
+        await controller.takePicture(path2);
+      } catch (e) {
+        print(e);
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(
+            imagePath1: path1,
+            imagePath2: path2,
+          ),
+        ),
+      );
     } catch (e) {
       print(e);
     }
@@ -147,12 +151,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
-    // 1
     availableCameras().then((availableCameras) {
       cameras = availableCameras;
       if (cameras.length > 0) {
         setState(() {
-          // 2
           selectedCameraIdx = 0;
         });
 
@@ -161,7 +163,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         print("No camera available");
       }
     }).catchError((err) {
-      // 3
       print('Error: $err.code\nError Message: $err.message');
     });
   }
@@ -169,9 +170,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Wait until the controller is initialized before displaying the
-      // camera preview. Use a FutureBuilder to display a loading spinner
-      // until the controller has finished initializing.
       body: Container(
         child: Column(
           children: [
