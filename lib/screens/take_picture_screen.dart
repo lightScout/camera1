@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:camera1_app/cubit/camera1_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -53,22 +55,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     }
   }
 
-  Widget _cameraPreviewWidget() {
-    if (controller == null || !controller.value.isInitialized) {
-      return const Text(
-        'Loading',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w900,
-        ),
+  Future<String> onCapture() async {
+    var path;
+    try {
+      path = join(
+        (await getTemporaryDirectory()).path,
+        '${DateTime.now()}.png',
       );
-    }
 
-    return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: CameraPreview(controller),
-    );
+      await controller.takePicture(path);
+      print('path $path');
+    } catch (e) {
+      print(e);
+    }
+    return path;
   }
 
   Widget _cameraTogglesRowWidget() {
@@ -111,43 +111,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     }
   }
 
-  void _onCapturePressed(context) async {
-    var path1;
-    var path2;
-    try {
-      path1 = join(
-        (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.png',
-      );
-
-      await controller.takePicture(path1);
-
-      _onSwitchCamera();
-
-      try {
-        path2 = join(
-          (await getTemporaryDirectory()).path,
-          '${DateTime.now()}.png',
-        );
-        await controller.takePicture(path2);
-      } catch (e) {
-        print(e);
-      }
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-            imagePath1: path1,
-            imagePath2: path2,
-          ),
-        ),
-      );
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -171,20 +134,98 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child: Column(
-          children: [
-            _cameraPreviewWidget(),
-            _cameraTogglesRowWidget(),
-          ],
+        color: Colors.black,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
+        child: BlocConsumer<Camera1Cubit, Camera1State>(
+          listener: (context, state) {
+            if (state is Camera1Error) {
+              Scaffold.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+          builder: (context, state) {
+            if (state is Camera1Initial) {
+              return buildInitialInput(controller, context);
+            } else if (state is Camera1FirstPhotoPreview) {
+              return buildFirstPhotoPreview(state.photoPath);
+            } else {
+              // (state is WeatherError)
+              return buildInitialInput(controller, context);
+            }
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera_alt),
-        // Provide an onPressed callback.
-        onPressed: () {
-          _onCapturePressed(context);
-        },
       ),
     );
   }
+
+  Widget buildFirstPhotoPreview(String photoPath) {
+    return DisplayPictureScreen(
+      imagePath: photoPath,
+    );
+  }
 }
+
+Widget buildInitialInput(CameraController controller, BuildContext context) {
+  return _cameraPreviewWidget(controller, context);
+}
+
+Widget _cameraPreviewWidget(CameraController controller, BuildContext context) {
+  if (controller == null || !controller.value.isInitialized) {
+    return const Text(
+      'Loading',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 20.0,
+        fontWeight: FontWeight.w900,
+      ),
+    );
+  }
+
+  return Column(
+    children: [
+      AspectRatio(
+        aspectRatio: controller.value.aspectRatio,
+        child: CameraPreview(controller),
+      ),
+      MaterialButton(
+        color: Colors.redAccent,
+        onPressed: () {
+          _takeFirstPhoto(context);
+        },
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+            side: BorderSide(color: Colors.deepOrange)),
+      ),
+    ],
+  );
+}
+
+void _takeFirstPhoto(BuildContext context) {
+  final camera1Cubit = context.bloc<Camera1Cubit>();
+  camera1Cubit.takeFirstPhoto();
+}
+
+// Scaffold(
+// body: Container(
+// child: Column(
+// children: [
+// _cameraPreviewWidget(),
+// _cameraTogglesRowWidget(),
+// ],
+// ),
+// ),
+// floatingActionButton: FloatingActionButton(
+// child: Icon(Icons.camera_alt),
+// // Provide an onPressed callback.
+// onPressed: () {
+// _onCapturePressed(context);
+// },
+// ),
+// );
+
+// else if (state is CorLoaded) {
+// return GestureDetector(
+// onTap: () => setState(() => _isFlipped = !_isFlipped),
+// child: buildColumnWithData(state.map, _isFlipped));
+// }
