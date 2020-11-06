@@ -9,10 +9,29 @@ class Camera1Initial extends Camera1State {
   List<Object> get props => throw UnimplementedError();
 }
 
-class Camera1FirstPhotoPreview extends Camera1State {
-  final photoPath;
+class Camera1TakePhotoPreview extends Camera1State {
+  final CameraController controller;
 
-  const Camera1FirstPhotoPreview(this.photoPath);
+  const Camera1TakePhotoPreview(this.controller);
+
+  @override
+  // TODO: implement props
+  List<Object> get props => throw UnimplementedError();
+}
+
+class Camera1FirstPhotoTaken extends Camera1State {
+  const Camera1FirstPhotoTaken();
+
+  @override
+  // TODO: implement props
+  List<Object> get props => throw UnimplementedError();
+}
+
+class Camera1PhotosPreview extends Camera1State {
+  final File imageFile1;
+  final File imageFile2;
+
+  const Camera1PhotosPreview({this.imageFile1, this.imageFile2});
 
   @override
   // TODO: implement props

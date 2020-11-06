@@ -1,21 +1,24 @@
 import 'dart:io';
 
+import 'package:camera1_app/widgets/build_card.dart';
+import 'package:camera1_app/widgets/flippable_box.dart';
 import 'package:flutter/material.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
+  final File imageFile;
+  final bool isFlipped;
 
-  const DisplayPictureScreen({this.imagePath});
+  const DisplayPictureScreen({this.imageFile, this.isFlipped});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Column(
+    return Container(
+      child: Column(
         children: [
-          Image.file(File(imagePath)),
+          FlippableBox(
+            back: buildCard(imageFile, 500, 300),
+            front: buildCard(null, 200, 200),
+          ),
         ],
       ),
     );
