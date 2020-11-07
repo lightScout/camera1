@@ -17,16 +17,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
-        backgroundColor: Colors.black87,
+        backgroundColor: Color(0xFF420e16),
         title: Center(
             child: Icon(
           Icons.adjust,
           size: 50,
-          color: Colors.grey[850],
+          color: Color(0xFF124736),
         )),
       ),
       body: Container(
-        color: Colors.black87,
+        color: Color(0xFF420e16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -57,19 +57,20 @@ Widget homeSelecionButton(IconData icon) {
       width: 150,
       height: 150,
       decoration: ShapeDecoration(
+        color: Colors.orange,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(10),
           ),
           side: BorderSide(
-            width: 4,
-            color: Colors.grey[400],
+            width: 3,
+            color: Color(0xFFE14A14),
           ),
         ),
       ),
       child: Icon(
         icon,
-        color: Colors.grey,
+        color: Color(0xFF124736),
         size: 88,
       ),
     ),

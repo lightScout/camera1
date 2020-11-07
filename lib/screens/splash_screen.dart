@@ -15,9 +15,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // Timer(Duration(seconds: 2), () {
-    //   Navigator.of(context).pushReplacementNamed(HomeScreen.id);
-    // });
+    Timer(Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacementNamed(HomeScreen.id);
+    });
     super.initState();
   }
 
