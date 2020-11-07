@@ -5,6 +5,7 @@ import 'package:camera1_app/widgets/flippable_box.dart';
 import 'package:flutter/material.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
+  static const String id = 'DisplayPictureScreen';
   final File imageFile;
   final bool isFlipped;
 

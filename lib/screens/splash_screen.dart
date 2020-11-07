@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:camera1_app/screens/home_screen.dart';
 import 'package:camera1_app/screens/take_picture_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera1_app/others/constants.dart';
@@ -15,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(Duration(seconds: 2), () {
-      Navigator.of(context).pushNamed(TakePictureScreen.id);
+      Navigator.of(context).pushReplacementNamed(HomeScreen.id);
     });
     super.initState();
   }

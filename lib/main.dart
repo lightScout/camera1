@@ -1,3 +1,5 @@
+import 'package:camera1_app/screens/home_screen.dart';
+import 'package:camera1_app/screens/splash_screen.dart';
 import 'package:camera1_app/screens/take_picture_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,11 +26,16 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: BlocProvider(
-        create: (context) => Camera1Cubit(),
-        child: TakePictureScreen(),
+    return BlocProvider<Camera1Cubit>(
+      create: (context) => Camera1Cubit(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: SplashScreen.id,
+        routes: {
+          SplashScreen.id: (context) => SplashScreen(),
+          TakePictureScreen.id: (context) => TakePictureScreen(),
+          HomeScreen.id: (context) => HomeScreen(),
+        },
       ),
     );
   }

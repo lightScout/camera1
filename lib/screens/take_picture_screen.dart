@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:camera1_app/cubit/camera1_cubit.dart';
+import 'package:camera1_app/screens/galery_screen.dart';
 import 'package:camera1_app/widgets/build_card.dart';
 import 'package:camera1_app/widgets/flippable_box.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   CameraController _controller;
   List cameras;
   int selectedCameraIdx;
+  final Color bgColor = Color(0xFF2A0F2E);
 
   // Widget _cameraTogglesRowWidget() {
   //   if (cameras == null || cameras.isEmpty) {
@@ -34,7 +36,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   //     child: Align(
   //       alignment: Alignment.centerLeft,
   //       child: FlatButton.icon(
-  //           onPressed: onSwitchCamera,
+  //           onPressed: reInitializeCameraOneController,
   //           icon: Icon(_getCameraLensIcon(lensDirection)),
   //           label: Text(
   //               "${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1)}")),
@@ -74,6 +76,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   //   });
   // }
 
+  // function for camera controller initialization
   Future _initCameraController(CameraDescription cameraDescription) async {
     if (_controller != null) {
       await _controller.dispose();
@@ -103,6 +106,8 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     }
   }
 
+//cuibt communication function to take the frist photo
+
   void _takeFirstPhotoCamera(
       BuildContext context, CameraController controller) async {
     final camera1Cubit = context.bloc<Camera1Cubit>();
@@ -111,6 +116,8 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     _takeSecondPhotoCamera(context);
   }
 
+//cuibt communication function to take the second photo
+
   void _takeSecondPhotoCamera(BuildContext context) async {
     CameraController _controller2 =
         CameraController(cameras[1], ResolutionPreset.high);
@@ -118,12 +125,11 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     final camera1Cubit = context.bloc<Camera1Cubit>();
     await camera1Cubit.takeSecondPhoto(context, _controller2);
     _controller2.dispose();
-    onSwitchCamera();
+    reInitializeCameraOneController();
   }
 
-  void onSwitchCamera() async {
-    // selectedCameraIdx =
-    //     selectedCameraIdx < cameras.length - 1 ? selectedCameraIdx + 1 : 0;
+// function for re-initialization of the front camera contrller after taking a photo
+  void reInitializeCameraOneController() async {
     CameraDescription selectedCamera = cameras[selectedCameraIdx];
     await _initCameraController(selectedCamera);
   }
@@ -147,54 +153,62 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     });
   }
 
+// take picture screeen tree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1B4079),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera),
-        backgroundColor: Colors.black,
-        onPressed: () {
-          photoPreview(context, _controller);
-        },
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        alignment: Alignment.center,
-        child: BlocConsumer<Camera1Cubit, Camera1State>(
-          listener: (context, state) {
-            if (state is Camera1Error) {
-              Scaffold.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
-          },
-          builder: (context, state) {
-            if (state is Camera1Initial) {
-              return buildInitialInput(context, null, null);
-            } else if (state is Camera1Loading) {
-              return buildLoading();
-            } else if (state is Camera1TakePhotoPreview) {
-              return cameraPreviewWidget(
-                context,
-                _controller,
-              );
-            } else if (state is Camera1FirstPhotoTaken) {
-              return Text('First photo taken');
-            } else if (state is Camera1PhotosPreview) {
-              return buildInitialInput(
-                  context, state.imageFile1, state.imageFile2);
-            } else {
-              // (state is WeatherError)
-              return buildInitialInput(context, null, null);
-            }
-          },
+      body: Center(
+        child: Container(
+          // decoration: BoxDecoration(
+          //     color: Color(0xFF1C0A1F),
+          //     border: Border.all(
+          //       color: Colors.black,
+          //     ),
+          //     borderRadius: BorderRadius.all(Radius.circular(20))),
+          // height: 800,
+          // width: 500,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          alignment: Alignment.center,
+          child: BlocConsumer<Camera1Cubit, Camera1State>(
+            listener: (context, state) {
+              if (state is Camera1Error) {
+                Scaffold.of(context)
+                    .showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
+            builder: (context, state) {
+              //first page - Galery
+              if (state is Camera1Initial) {
+                return buildInitialInput(context, _controller);
+                //loading call
+              } else if (state is Camera1Loading) {
+                return buildLoading();
+              } else if (state is Camera1TakePhotoPreview) {
+                return cameraPreviewWidget(
+                  context,
+                  _controller,
+                );
+              } else if (state is Camera1FirstPhotoTaken) {
+                return Text('First photo taken');
+              } else if (state is Camera1PhotosPreview) {
+                return buildPreviewScreen(
+                    context, state.imageFile1, state.imageFile2);
+              } else {
+                // (state is WeatherError)
+                return buildInitialInput(context, _controller);
+              }
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget cameraPreviewWidget(BuildContext context,
-      CameraController controller) {
+// camera preview widget
+  Widget cameraPreviewWidget(
+      BuildContext context, CameraController controller) {
+    final size = MediaQuery.of(context).size;
+    final deviceRatio = size.width / size.height;
     if (controller == null || !controller.value.isInitialized) {
       return const Text(
         'Loading',
@@ -206,26 +220,76 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       );
     }
 
-    return Column(
+    return Stack(
       children: [
-        AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CameraPreview(controller),
+        Transform.scale(
+          scale: controller.value.aspectRatio / deviceRatio,
+          child: Center(
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CameraPreview(controller),
+            ),
+          ),
         ),
-        FloatingActionButton(onPressed: () async {
-          _takeFirstPhotoCamera(context, controller);
-          print(selectedCameraIdx);
-        })
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 33),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FloatingActionButton(
+                    onPressed: () async {
+                      _takeFirstPhotoCamera(context, controller);
+                      print(selectedCameraIdx);
+                    },
+                    child: Icon(Icons.camera),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 22),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 33,
+                    ),
+                  ),
+                  Icon(
+                    Icons.flash_on_rounded,
+                    size: 33,
+                  ),
+                  Icon(
+                    Icons.timer,
+                    size: 33,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
+
+  Widget buildInitialInput(BuildContext context, CameraController controller) {
+    return cameraPreviewWidget(context, controller);
+  }
 }
 
-Widget buildInitialInput(BuildContext context, File image1, File image2) {
-  return _galleryWidget(context, image1, image2);
+Widget buildPreviewScreen(BuildContext context, File image1, File image2) {
+  return _previewWidget(context, image1, image2);
 }
 
-Widget _galleryWidget(BuildContext context, File image1, File image2) {
+Widget _previewWidget(BuildContext context, File image1, File image2) {
   return Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
