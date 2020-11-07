@@ -1,5 +1,7 @@
+import 'package:camera1_app/cubit/camera1_cubit.dart';
 import 'package:camera1_app/screens/take_picture_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'HomeScreen';
@@ -33,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 GestureDetector(
                     onTap: () {
+                      final camera1Cubit = context.bloc<Camera1Cubit>();
+                      camera1Cubit.cameraPreview();
                       Navigator.of(context).pushNamed(TakePictureScreen.id);
                     },
                     child: homeSelecionButton(Icons.camera)),

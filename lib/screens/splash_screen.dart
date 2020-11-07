@@ -15,23 +15,32 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Timer(Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacementNamed(HomeScreen.id);
-    });
+    // Timer(Duration(seconds: 2), () {
+    //   Navigator.of(context).pushReplacementNamed(HomeScreen.id);
+    // });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black87,
       body: Center(
         child: Container(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'camera1',
-                style: KSplashScreen,
+              Container(
+                width: 300.0,
+                height: 300.0,
+                decoration: new BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  'C2',
+                  style: KSplashScreen,
+                ),
               ),
               SizedBox(
                 height: 11,
@@ -39,8 +48,11 @@ class _SplashScreenState extends State<SplashScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 150.0),
                 child: Text(
-                  'From J&J',
-                  style: TextStyle(color: Colors.grey, fontSize: 11),
+                  'From JJ Lightscout',
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 22,
+                      fontFamily: "BungeeShade"),
                 ),
               ),
             ],

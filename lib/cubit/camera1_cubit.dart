@@ -11,14 +11,22 @@ part 'camera1_state.dart';
 
 class Camera1Cubit extends Cubit<Camera1State> {
   Camera1Cubit() : super(Camera1Initial());
-  File imageFile1;
-  File imageFile2;
+  File _imageFile1;
+  File _imageFile2;
+
+  Future<void> cameraPreview() async {
+    try {
+      emit(Camera1Initial());
+    } catch (e) {
+      emit(Camera1Error(e));
+    }
+  }
 
   Future<void> takeFirstPhoto(
       BuildContext context, CameraController controller) async {
     try {
       emit(Camera1Loading());
-      imageFile1 = await _onCapturePressed(context, controller);
+      _imageFile1 = await _onCapturePressed(context, controller);
       emit(Camera1FirstPhotoTaken());
     } catch (e) {
       emit(Camera1Error(e));
@@ -29,17 +37,9 @@ class Camera1Cubit extends Cubit<Camera1State> {
       BuildContext context, CameraController controller) async {
     try {
       emit(Camera1Loading());
-      imageFile2 = await _onCapturePressed(context, controller);
-      emit(
-          Camera1PhotosPreview(imageFile1: imageFile1, imageFile2: imageFile2));
-    } catch (e) {
-      emit(Camera1Error(e));
-    }
-  }
-
-  Future<void> photoPreview(CameraController controller) async {
-    try {
-      emit(Camera1TakePhotoPreview(controller));
+      _imageFile2 = await _onCapturePressed(context, controller);
+      emit(Camera1PhotosPreview(
+          imageFile1: _imageFile1, imageFile2: _imageFile2));
     } catch (e) {
       emit(Camera1Error(e));
     }

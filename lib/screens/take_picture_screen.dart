@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:camera1_app/cubit/camera1_cubit.dart';
 import 'package:camera1_app/screens/galery_screen.dart';
 import 'package:camera1_app/widgets/build_card.dart';
+import 'package:camera1_app/widgets/camera_preview.dart';
 import 'package:camera1_app/widgets/flippable_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -183,11 +184,6 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
                 //loading call
               } else if (state is Camera1Loading) {
                 return buildLoading();
-              } else if (state is Camera1TakePhotoPreview) {
-                return cameraPreviewWidget(
-                  context,
-                  _controller,
-                );
               } else if (state is Camera1FirstPhotoTaken) {
                 return Text('First photo taken');
               } else if (state is Camera1PhotosPreview) {
@@ -205,83 +201,10 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   }
 
 // camera preview widget
-  Widget cameraPreviewWidget(
-      BuildContext context, CameraController controller) {
-    final size = MediaQuery.of(context).size;
-    final deviceRatio = size.width / size.height;
-    if (controller == null || !controller.value.isInitialized) {
-      return const Text(
-        'Loading',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w900,
-        ),
-      );
-    }
-
-    return Stack(
-      children: [
-        Transform.scale(
-          scale: controller.value.aspectRatio / deviceRatio,
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: CameraPreview(controller),
-            ),
-          ),
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 33),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FloatingActionButton(
-                    onPressed: () async {
-                      _takeFirstPhotoCamera(context, controller);
-                      print(selectedCameraIdx);
-                    },
-                    child: Icon(Icons.camera),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 22),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: 33,
-                    ),
-                  ),
-                  Icon(
-                    Icons.flash_on_rounded,
-                    size: 33,
-                  ),
-                  Icon(
-                    Icons.timer,
-                    size: 33,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
-      ],
-    );
-  }
 
   Widget buildInitialInput(BuildContext context, CameraController controller) {
-    return cameraPreviewWidget(context, controller);
+    return cameraPreviewWidget(
+        context, controller, () => _takeFirstPhotoCamera(context, controller));
   }
 }
 
@@ -302,6 +225,31 @@ Widget _previewWidget(BuildContext context, File image1, File image2) {
           back: buildCard(image2, 500, 300),
           front: buildCard(image2, 200, 200),
         ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 22),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Icon(
+                  Icons.arrow_back,
+                  size: 33,
+                ),
+              ),
+              Icon(
+                Icons.flash_on_rounded,
+                size: 33,
+              ),
+              Icon(
+                Icons.timer,
+                size: 33,
+              ),
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -311,11 +259,6 @@ Widget _previewWidget(BuildContext context, File image1, File image2) {
 //   final camera1Cubit = context.bloc<Camera1Cubit>();
 //   camera1Cubit.takeFirstPhoto(picker);
 // }
-
-void photoPreview(BuildContext context, CameraController controller) {
-  final camera1Cubit = context.bloc<Camera1Cubit>();
-  camera1Cubit.photoPreview(controller);
-}
 
 Widget buildLoading() {
   return Center(
