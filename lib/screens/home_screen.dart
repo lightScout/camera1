@@ -15,13 +15,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Color appBarColor = Colors.orange;
-  final Color mainContainerColor = Color(0xFF8C86AA);
+  final Color mainContainerColor = Color(0xFF2E3532);
   final bool isGaleryEmpry = true;
 
   Widget float1() {
     return Container(
       child: FloatingActionButton(
-        backgroundColor: Color(0xFF9FBBA3),
+        backgroundColor: Color(0xFF2176AE),
         heroTag: 'galery',
         onPressed: () {
           Navigator.of(context).pushNamed(TakePictureScreen.id);
@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Icon(
           Icons.camera,
           color: Colors.black,
+          size: 35,
         ),
       ),
     );
@@ -38,11 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget float2() {
     return Container(
       child: FloatingActionButton(
-        backgroundColor: Color(0xFFB2EF9B),
+        backgroundColor: Color(0xFF885053),
         heroTag: 'camera',
         onPressed: null,
         tooltip: 'Third button',
-        child: Icon(Icons.camera_roll, color: Colors.black),
+        child: Icon(
+          Icons.camera_roll,
+          color: Colors.black,
+          size: 35,
+        ),
       ),
     );
   }
@@ -50,11 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget float3() {
     return Container(
       child: FloatingActionButton(
-        backgroundColor: Color(0xFFC6E872),
+        backgroundColor: Color(0xFFC4742A),
         heroTag: 'settings',
         onPressed: null,
         tooltip: 'First button',
-        child: Icon(Icons.settings, color: Colors.black),
+        child: Icon(
+          Icons.settings,
+          color: Colors.black,
+          size: 35,
+        ),
       ),
     );
   }
@@ -67,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: AnimatedFloatingActionButton(
             //Fab list
             fabButtons: <Widget>[float1(), float2(), float3()],
-            colorStartAnimation: Color(0xFF7E3F8F),
-            colorEndAnimation: Color(0xFF81559B),
+            colorStartAnimation: Color(0xFF8B2635),
+            colorEndAnimation: Color(0xFFFF9800),
             animatedIconData: AnimatedIcons.menu_close //To principal button
             ),
       ),
@@ -86,14 +95,31 @@ class _HomeScreenState extends State<HomeScreen> {
         color: mainContainerColor,
         child: isGaleryEmpry
             ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'C2',
-                        style: KSplashScreen.copyWith(color: Colors.grey[900]),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 64.0, right: 34),
+                        child: Hero(
+                          tag: 'logo',
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Container(
+                              width: 130.0,
+                              height: 100.0,
+                              decoration: new BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                'C2',
+                                style: KSplashScreen.copyWith(fontSize: 60),
+                              ),
+                            ),
+                          ),
+                        ),
                       )
                     ],
                   )
